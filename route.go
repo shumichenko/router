@@ -6,31 +6,43 @@ import (
 )
 
 type Route struct {
-	Path    string
-	Method  string
-	Handler func(http.ResponseWriter, *http.Request)
+	path    string
+	method  string
+	handler func(http.ResponseWriter, *http.Request)
 }
 
 func NewRoute(path string, method string, handler func(http.ResponseWriter, *http.Request)) Route {
 	if len(path) < 1 {
-		panic("Path cannot be empty")
+		panic("path cannot be empty")
 	}
 	if path[0] != '/' {
-		panic("Path should start with /")
+		panic("path should start with /")
 	}
 	if len(method) < 1 {
-		panic("Method cannot be empty")
+		panic("method cannot be empty")
 	}
-
 	lastIndex := len(path) - 1
 	if lastIndex > 0 && '/' == path[lastIndex] {
-		path = path[0:lastIndex]
+		panic("path should not contain trailing /")
 	}
+
 	path = strings.ToLower(path)
 
 	return Route{
-		Path:    path,
-		Method:  method,
-		Handler: handler,
+		path:    path,
+		method:  method,
+		handler: handler,
 	}
+}
+
+func (r Route) GetPath() string {
+	return r.path
+}
+
+func (r Route) GetMethod() string {
+	return r.method
+}
+
+func (r Route) GetHandler() func(http.ResponseWriter, *http.Request) {
+	return r.handler
 }

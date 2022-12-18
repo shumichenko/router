@@ -15,78 +15,57 @@ func TestMatchingRouteReturnedWhenStaticPathRequested(t *testing.T) {
 	casesList := []pathCase{
 		{
 			Requested: NewRoute("/", http.MethodGet, handlerMock),
-			Registered: []Route{
-				NewRoute("/", http.MethodGet, handlerMock),
-				NewRoute("/new", http.MethodGet, handlerMock),
-				NewRoute("/news/:news", http.MethodGet, handlerMock),
-				NewRoute("/news/:id/comments", http.MethodGet, handlerMock),
-				NewRoute("/news", http.MethodGet, handlerMock),
-				NewRoute("/news", http.MethodPost, handlerMock),
-				NewRoute("/", http.MethodPost, handlerMock),
-			},
-			Wanted: NewRoute("/", http.MethodGet, handlerMock),
+			Wanted:    NewRoute("/", http.MethodGet, handlerMock),
 		},
 		{
 			Requested: NewRoute("/news", http.MethodGet, handlerMock),
-			Registered: []Route{
-				NewRoute("/", http.MethodGet, handlerMock),
-				NewRoute("/new", http.MethodGet, handlerMock),
-				NewRoute("/news/:news", http.MethodGet, handlerMock),
-				NewRoute("/news/:id/comments", http.MethodGet, handlerMock),
-				NewRoute("/news", http.MethodGet, handlerMock),
-				NewRoute("/news", http.MethodPost, handlerMock),
-				NewRoute("/comments", http.MethodPost, handlerMock),
-			},
-			Wanted: NewRoute("/news", http.MethodGet, handlerMock),
+			Wanted:    NewRoute("/news", http.MethodGet, handlerMock),
 		},
 		{
 			Requested: NewRoute("/comMenTs", http.MethodGet, handlerMock),
-			Registered: []Route{
-				NewRoute("/", http.MethodGet, handlerMock),
-				NewRoute("/c", http.MethodGet, handlerMock),
-				NewRoute("/comments", http.MethodGet, handlerMock),
-				NewRoute("/comments/:id", http.MethodGet, handlerMock),
-				NewRoute("/news/:id/comments", http.MethodGet, handlerMock),
-				NewRoute("/news", http.MethodPost, handlerMock),
-				NewRoute("/comments", http.MethodPost, handlerMock),
-			},
-			Wanted: NewRoute("/comments", http.MethodGet, handlerMock),
+			Wanted:    NewRoute("/comments", http.MethodGet, handlerMock),
+		},
+		{
+			Requested: NewRoute("/ComMenTS/", http.MethodGet, handlerMock),
+			Wanted:    NewRoute("/comments", http.MethodGet, handlerMock),
 		},
 		{
 			Requested: NewRoute("/v1/news/334", http.MethodGet, handlerMock),
-			Registered: []Route{
-				NewRoute("/v1/news", http.MethodGet, handlerMock),
-				NewRoute("/v1/news/:id", http.MethodGet, handlerMock),
-				NewRoute("/v1/news/:id/comments", http.MethodGet, handlerMock),
-				NewRoute("/v1/comments", http.MethodPost, handlerMock),
-			},
-			Wanted: NewRoute("/v1/news/:id", http.MethodGet, handlerMock),
+			Wanted:    NewRoute("/v1/news/:id", http.MethodGet, handlerMock),
 		},
 		{
 			Requested: NewRoute("/v1/news/12/comments", http.MethodGet, handlerMock),
-			Registered: []Route{
-				NewRoute("/v1/news", http.MethodGet, handlerMock),
-				NewRoute("/v1/news/:id", http.MethodGet, handlerMock),
-				NewRoute("/v1/news/:id/comments", http.MethodGet, handlerMock),
-				NewRoute("/v1/comments", http.MethodPost, handlerMock),
-			},
-			Wanted: NewRoute("/v1/news/:id/comments", http.MethodGet, handlerMock),
+			Wanted:    NewRoute("/v1/news/:id/comments", http.MethodGet, handlerMock),
 		},
 	}
 
-	for _, data := range casesList {
-		router := NewRouter()
-		router.AddRoutes(data.Registered)
+	routesList := []Route{
+		NewRoute("/", http.MethodGet, handlerMock),
+		NewRoute("/", http.MethodPost, handlerMock),
+		NewRoute("/new", http.MethodGet, handlerMock),
+		NewRoute("/news", http.MethodGet, handlerMock),
+		NewRoute("/news", http.MethodPost, handlerMock),
+		NewRoute("/news/:news", http.MethodGet, handlerMock),
+		NewRoute("/news/:id/comments", http.MethodGet, handlerMock),
+		NewRoute("/c", http.MethodGet, handlerMock),
+		NewRoute("/comments", http.MethodGet, handlerMock),
+		NewRoute("/comments", http.MethodPost, handlerMock),
+		NewRoute("/comments/:id", http.MethodGet, handlerMock),
+	}
 
-		receivedRoute, err := router.GetRoute(data.Requested.Path, data.Requested.Method)
+	router := NewRouter()
+	router.AddRoutes(routesList)
+
+	for _, data := range casesList {
+		receivedRoute, err := router.GetRoute(data.Requested.GetPath(), data.Requested.GetMethod())
 		if nil != err {
-			t.Errorf("Router did not return any route")
+			t.Errorf("router did not return any route")
 		}
-		if receivedRoute.Path != data.Wanted.Path {
-			t.Errorf("Route with unexpected path received from router")
+		if receivedRoute.GetPath() != data.Wanted.GetPath() {
+			t.Errorf("route with unexpected path received from router")
 		}
-		if receivedRoute.Method != data.Wanted.Method {
-			t.Errorf("Route with unexpected method received from router")
+		if receivedRoute.GetMethod() != data.Wanted.GetMethod() {
+			t.Errorf("route with unexpected method received from router")
 		}
 	}
 }
@@ -101,10 +80,10 @@ func TestNotFoundWhenNonExistentPathRequested(t *testing.T) {
 	}
 	router := NewRouter()
 	router.AddRoutes(routesList)
-	_, err := router.GetRoute(wantedRoute.Path, wantedRoute.Method)
+	_, err := router.GetRoute(wantedRoute.GetPath(), wantedRoute.GetMethod())
 
 	if nil == err {
-		t.Errorf("Got route but non existent path requested")
+		t.Errorf("got route but non existent path requested")
 	}
 }
 
@@ -118,16 +97,16 @@ func TestMethodNotAllowedWhenNonExistentMethodRequested(t *testing.T) {
 	router := NewRouter()
 	router.AddRoutes(routesList)
 
-	_, err := router.GetRoute(wantedRoute.Path, wantedRoute.Method)
+	_, err := router.GetRoute(wantedRoute.GetPath(), wantedRoute.GetMethod())
 	if nil == err {
-		t.Errorf("Got route but not allowed method requested")
+		t.Errorf("got route but not allowed method requested")
 	}
 }
 
 func TestPanicWhenIntersectingRouteAdded(t *testing.T) {
 	defer func() {
 		if r := recover(); nil == r {
-			t.Errorf("Intersecting route was registered")
+			t.Errorf("intersecting route was registered")
 		}
 	}()
 
@@ -153,6 +132,15 @@ func TestPanicWhenIntersectingRouteAdded(t *testing.T) {
 			NewRoute("/news/:id", http.MethodGet, handlerMock),
 			NewRoute("/news/:test", http.MethodGet, handlerMock),
 			NewRoute("/news/:id/comments", http.MethodGet, handlerMock),
+			NewRoute("/news", http.MethodPost, handlerMock),
+			NewRoute("/comments", http.MethodPost, handlerMock),
+		},
+		{
+			NewRoute("/news", http.MethodGet, handlerMock),
+			NewRoute("/news/:id", http.MethodGet, handlerMock),
+			NewRoute("/news/:id/:type", http.MethodGet, handlerMock),
+			NewRoute("/news/:id/comments", http.MethodGet, handlerMock),
+			NewRoute("/news/example/types", http.MethodGet, handlerMock),
 			NewRoute("/news", http.MethodPost, handlerMock),
 			NewRoute("/comments", http.MethodPost, handlerMock),
 		},

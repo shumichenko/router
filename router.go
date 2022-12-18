@@ -9,28 +9,28 @@ type Router struct {
 	routesList map[string][]Route
 }
 
-func NewRouter() Router {
-	router := Router{
+func NewRouter() *Router {
+	router := &Router{
 		routesList: map[string][]Route{},
 	}
 
 	return router
 }
 
-func (r Router) AddRoutes(routesList []Route) {
+func (r *Router) AddRoutes(routesList []Route) {
 	for _, route := range routesList {
-		_, err := r.GetRoute(route.Path, route.Method)
+		_, err := r.GetRoute(route.GetPath(), route.GetMethod())
 		if nil == err {
 			panic(fmt.Sprintf(
-				"Route %s %s intersects with an existing one and cannot be registered", route.Method, route.Path,
+				"route %s %s intersects with an existing one and cannot be registered", route.GetMethod(), route.GetPath(),
 			))
 		}
 
-		r.routesList[route.Method] = append(r.routesList[route.Method], route)
+		r.routesList[route.GetMethod()] = append(r.routesList[route.GetMethod()], route)
 	}
 }
 
-func (r Router) GetRoute(path string, method string) (Route, error) {
+func (r *Router) GetRoute(path string, method string) (Route, error) {
 	path = r.formatPath(path)
 	if "/" == path {
 		return r.findSlashRoute(method)
@@ -56,10 +56,10 @@ func (r Router) GetRoute(path string, method string) (Route, error) {
 	return Route{}, NewNoSuchRouteError()
 }
 
-func (r Router) findSlashRoute(method string) (Route, error) {
+func (r *Router) findSlashRoute(method string) (Route, error) {
 	if routesToScan, ok := r.routesList[method]; ok {
 		for _, route := range routesToScan {
-			if "/" == route.Path {
+			if "/" == route.GetPath() {
 				return route, nil
 			}
 		}
@@ -70,7 +70,7 @@ func (r Router) findSlashRoute(method string) (Route, error) {
 			continue
 		}
 		for _, route := range group {
-			if "/" == route.Path {
+			if "/" == route.GetPath() {
 				return Route{}, NewMethodNotAllowedError()
 			}
 		}
@@ -79,12 +79,12 @@ func (r Router) findSlashRoute(method string) (Route, error) {
 	return Route{}, NewNoSuchRouteError()
 }
 
-func (r Router) findRouteByPathParts(requestedParts []string, routesToScan []Route) (Route, error) {
+func (r *Router) findRouteByPathParts(requestedParts []string, routesToScan []Route) (Route, error) {
 	for _, route := range routesToScan {
-		if "/" == route.Path {
+		if "/" == route.GetPath() {
 			continue
 		}
-		existingParts := r.splitFormattedPath(route.Path)
+		existingParts := r.splitFormattedPath(route.GetPath())
 		if len(existingParts) != len(requestedParts) {
 			continue
 		}
@@ -96,7 +96,7 @@ func (r Router) findRouteByPathParts(requestedParts []string, routesToScan []Rou
 	return Route{}, NewNoSuchRouteError()
 }
 
-func (r Router) isRequestedPathEqual(requestedParts []string, existingParts []string) bool {
+func (r *Router) isRequestedPathEqual(requestedParts []string, existingParts []string) bool {
 	for i, existing := range existingParts {
 		isPartStatic := ':' != existing[0]
 		if isPartStatic && existing != requestedParts[i] {
@@ -107,7 +107,7 @@ func (r Router) isRequestedPathEqual(requestedParts []string, existingParts []st
 	return true
 }
 
-func (r Router) formatPath(path string) string {
+func (r *Router) formatPath(path string) string {
 	if len(path) < 1 {
 		return "/"
 	}
@@ -125,7 +125,7 @@ func (r Router) formatPath(path string) string {
 	return path
 }
 
-func (r Router) splitFormattedPath(path string) []string {
+func (r *Router) splitFormattedPath(path string) []string {
 	parts := strings.Split(path, "/")
 
 	return parts[1:]
