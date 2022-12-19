@@ -22,7 +22,9 @@ func (r *Router) AddRoutes(routesList []Route) {
 		_, err := r.GetRoute(route.GetPath(), route.GetMethod())
 		if nil == err {
 			panic(fmt.Sprintf(
-				"route %s %s intersects with an existing one and cannot be registered", route.GetMethod(), route.GetPath(),
+				"route %s %s intersects with an existing one and cannot be registered",
+				route.GetMethod(),
+				route.GetPath(),
 			))
 		}
 

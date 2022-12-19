@@ -26,16 +26,12 @@ func TestMatchingRouteReturnedWhenStaticPathRequested(t *testing.T) {
 			Wanted:    NewRoute("/comments", http.MethodGet, handlerMock),
 		},
 		{
-			Requested: NewRoute("/ComMenTS/", http.MethodGet, handlerMock),
-			Wanted:    NewRoute("/comments", http.MethodGet, handlerMock),
+			Requested: NewRoute("/news/334", http.MethodGet, handlerMock),
+			Wanted:    NewRoute("/news/:id", http.MethodGet, handlerMock),
 		},
 		{
-			Requested: NewRoute("/v1/news/334", http.MethodGet, handlerMock),
-			Wanted:    NewRoute("/v1/news/:id", http.MethodGet, handlerMock),
-		},
-		{
-			Requested: NewRoute("/v1/news/12/comments", http.MethodGet, handlerMock),
-			Wanted:    NewRoute("/v1/news/:id/comments", http.MethodGet, handlerMock),
+			Requested: NewRoute("/news/12/comments", http.MethodGet, handlerMock),
+			Wanted:    NewRoute("/news/:id/comments", http.MethodGet, handlerMock),
 		},
 	}
 
@@ -45,7 +41,7 @@ func TestMatchingRouteReturnedWhenStaticPathRequested(t *testing.T) {
 		NewRoute("/new", http.MethodGet, handlerMock),
 		NewRoute("/news", http.MethodGet, handlerMock),
 		NewRoute("/news", http.MethodPost, handlerMock),
-		NewRoute("/news/:news", http.MethodGet, handlerMock),
+		NewRoute("/news/:id", http.MethodGet, handlerMock),
 		NewRoute("/news/:id/comments", http.MethodGet, handlerMock),
 		NewRoute("/c", http.MethodGet, handlerMock),
 		NewRoute("/comments", http.MethodGet, handlerMock),
