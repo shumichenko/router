@@ -32,6 +32,15 @@ func TestPanicWhenPathWithNoStartingSlashProvided(t *testing.T) {
 	NewRoute("news", "", handlerMock)
 }
 
+func TestPanicWhenRestrictedCharsInPath(t *testing.T) {
+	defer func() {
+		if r := recover(); nil == r {
+			t.Errorf("route was created with restricted chars")
+		}
+	}()
+	NewRoute("/news?", "", handlerMock)
+}
+
 func TestTrailingSlashRemoved(t *testing.T) {
 	defer func() {
 		if r := recover(); nil == r {

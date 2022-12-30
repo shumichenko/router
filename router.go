@@ -128,7 +128,8 @@ func (r *Router) formatPath(path string) string {
 }
 
 func (r *Router) splitFormattedPath(path string) []string {
-	parts := strings.Split(path, "/")
+	parts := strings.Split(path, "?")
+	parts = strings.Split(parts[0], "/")
 
 	return parts[1:]
 }

@@ -22,6 +22,10 @@ func TestMatchingRouteReturnedWhenStaticPathRequested(t *testing.T) {
 			Wanted:    NewRoute("/news", http.MethodGet, handlerMock),
 		},
 		{
+			Requested: NewRoute("/news?example=true&something=else", http.MethodGet, handlerMock),
+			Wanted:    NewRoute("/news", http.MethodGet, handlerMock),
+		},
+		{
 			Requested: NewRoute("/comMenTs", http.MethodGet, handlerMock),
 			Wanted:    NewRoute("/comments", http.MethodGet, handlerMock),
 		},

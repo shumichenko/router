@@ -21,6 +21,9 @@ func NewRoute(path string, method string, handler func(http.ResponseWriter, *htt
 	if len(method) < 1 {
 		panic("method cannot be empty")
 	}
+	if strings.Contains("?", path) {
+		panic("path should not contain ? character ")
+	}
 	lastIndex := len(path) - 1
 	if lastIndex > 0 && '/' == path[lastIndex] {
 		panic("path should not contain trailing /")
