@@ -2,10 +2,11 @@ package router
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
-func BenchmarkRouter_GetRoute(b *testing.B) {
+func BenchmarkRouter_ServeHTTP(b *testing.B) {
 	var routesList []Route
 
 	methodsList := []string{
@@ -43,5 +44,9 @@ func BenchmarkRouter_GetRoute(b *testing.B) {
 	b.ReportAllocs()
 	b.ResetTimer()
 
-	_, _ = router.GetRoute("/news/103/comments/10/statistics/test/test", http.MethodGet)
+	recorder := httptest.NewRecorder()
+	for i := 0; i < b.N; i++ {
+		request, _ := http.NewRequest(http.MethodGet, "/news/103/comments/10/statistics/test/test", nil)
+		router.ServeHTTP(recorder, request)
+	}
 }
