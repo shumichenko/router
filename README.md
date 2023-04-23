@@ -59,36 +59,36 @@ title := params.GetByName("title") // hello-this-is-test-2020-03
 - path should NOT contain trailing "/" symbol (in case of path requested like this,
 trailing slash will be automatically removed from requested path)
 - router is not case-sensitive, declared path will be automatically formatted to lower case
-- you can't declare intersecting routes with same request method. Requested path can match only one route.  
-<br />
+- you can't declare intersecting routes with same request method. Requested path can match only one route.
 
-    Example of intersecting routes:    
-    
-    GET  /users            ###
-    GET  /users            ### intersecting
-    GET  /users/:id
-    GET  /users/:id/comments
-    GET  /users/:id/statistics
-    POST /users
+```
+Example of intersecting routes:    
 
-    GET  /users
-    GET  /users/:id         ###
-    GET  /users/statistics  ### intersecting
-    GET  /users/:id/comments
-    GET  /users/:id/statistics
-    POST /users
+GET  /users            ###
+GET  /users            ### intersecting
+GET  /users/:id
+GET  /users/:id/comments
+GET  /users/:id/statistics
+POST /users
 
-    GET  /users
-    GET  /users/:id         ###
-    GET  /users/:dynamic    ### intersecting
-    GET  /users/:id/comments
-    GET  /users/:id/statistics
-    POST /users
+GET  /users
+GET  /users/:id         ###
+GET  /users/statistics  ### intersecting
+GET  /users/:id/comments
+GET  /users/:id/statistics
+POST /users
 
-    GET  /users
-    GET  /users/:id         
-    GET  /users/:id/:type     ###
-    GET  /users/:id/comments  ### intersecting
-    GET  /users/example/types ### intersecting
-    POST /users
-    
+GET  /users
+GET  /users/:id         ###
+GET  /users/:dynamic    ### intersecting
+GET  /users/:id/comments
+GET  /users/:id/statistics
+POST /users
+
+GET  /users
+GET  /users/:id         
+GET  /users/:id/:type     ###
+GET  /users/:id/comments  ### intersecting
+GET  /users/example/types ### intersecting
+POST /users
+  ```
